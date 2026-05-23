@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abhi & Aditi WhatsApp Style Chat</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0b141a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .app {
+      width: min(1200px, 100%);
+      height: min(760px, 100vh);
+      background: #111b21;
+      border-radius: 18px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    }
+    .sidebar {
+      background: #111b21;
+      border-right: 1px solid #22303a;
+      color: #e9edef;
+      display: flex;
+      flex-direction: column;
+    }
+    .side-top {
+      padding: 18px;
+      background: #202c33;
+    }
+    .side-top h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+    .side-top p {
+      margin: 0;
+      color: #8696a0;
+      font-size: 13px;
+    }
+    .join-box {
+      padding: 16px 18px;
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid #22303a;
+      background: #111b21;
+    }
+    .join-box input {
+      flex: 1;
+      border: 1px solid #2a3942;
+      background: #202c33;
+      color: white;
+      border-radius: 12px;
+      padding: 12px 14px;
+      outline: none;
+    }
+    .join-box button {
+      border: 0;
+      background: #00a884;
+      color: white;
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .contacts {
+      padding: 8px;
+      overflow-y: auto;
+    }
+    .contact {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-bottom: 6px;
+      background: transparent;
+      transition: .15s;
+    }
+    .contact:hover, .contact.active { background: #202c33; }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: bold;
+      color: white;
+      flex: 0 0 auto;
+    }
+    .avatar.abhi { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+    .avatar.aditi { background: linear-gradient(135deg, #db2777, #f472b6); }
+    .contact-info { flex: 1; }
+    .contact-name { font-weight: bold; }
+    .contact-last { font-size: 13px; color: #8696a0; margin-top: 3px; }
+    .main {
+      display: flex;
+      flex-direction: column;
+      background: #0b141a;
+    }
+    .header {
+      height: 72px;
+      background: #202c33;
+      border-bottom: 1px solid #22303a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      color: white;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-name {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .header-sub {
+      font-size: 13px;
+      color: #8696a0;
+      margin-top: 3px;
+    }
+    .chat {
+      flex: 1;
+      padding: 18px;
+      overflow-y: auto;
+      background: radial-gradient(circle at top, #1a2c34 0, #0b141a 50%);
+    }
+    .bubble {
+      max-width: 70%;
+      padding: 10px 12px;
+      margin: 10px 0;
+      border-radius: 12px;
+      position: relative;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .bubble.me {
+      margin-left: auto;
+      background: #005c4b;
+      color: #e9edef;
+      border-top-right-radius: 4px;
+    }
+    .bubble.them {
+      margin-right: auto;
+      background: #202c33;
+      color: #e9edef;
+      border-top-left-radius: 4px;
+    }
+    .bubble .meta {
+      margin-top: 6px;
+      font-size: 11px;
+      color: rgba(233,237,239,.7);
+      text-align: right;
+    }
+    .system {
+      text-align: center;
+      color: #8696a0;
+      font-size: 13px;
+      margin: 12px auto;
+      width: fit-content;
+      background: rgba(32,44,51,.8);
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+    .composer-wrap {
+      background: #202c33;
+      padding: 12px;
+      border-top: 1px solid #22303a;
+      position: relative;
+    }
+    .composer {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .composer input {
+      flex: 1;
+      border: 0;
+      outline: none;
+      background: #2a3942;
+      color: white;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-size: 15px;
+    }
+    .composer button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 15px;
+    }
+    .emoji-btn { background: #2a3942; color: white; }
+    .send-btn { background: #00a884; color: white; font-weight: bold; }
+    .emoji-panel {
+      position: absolute;
+      right: 12px;
+      bottom: 72px;
+      width: 260px;
+      padding: 10px;
+      border-radius: 16px;
+      background: #111b21;
+      border: 1px solid #2a3942;
+      display: none;
+      flex-wrap: wrap;
+      gap: 6px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+    .emoji-panel button {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 10px;
+      background: #202c33;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .notif {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      background: #202c33;
+      color: white;
+      border: 1px solid #2a3942;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: none;
+      z-index: 9999;
+      max-width: 300px;
+      box-shadow: 0 14px 36px rgba(0,0,0,.35);
+    }
+    @media (max-width: 860px) {
+      .app { grid-template-columns: 1fr; height: 100vh; border-radius: 0; }
+      .sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="notif" id="notif"></div>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="side-top">
+        <h1>WhatsApp Style</h1>
+        <p>Abhi and Aditi realtime chat</p>
+      </div>
+
+      <div class="join-box">
+        <input id="nameInput" placeholder="Abhi or Aditi" />
+        <button id="joinBtn">Join</button>
+      </div>
+
+      <div class="contacts">
+        <div class="contact active" id="abhiContact">
+          <div class="avatar abhi">A</div>
+          <div class="contact-info">
+            <div class="contact-name">Abhi</div>
+            <div class="contact-last">Tap to chat</div>
+          </div>
+        </div>
+
+        <div class="contact" id="aditiContact">
+          <div class="avatar aditi">A</div>
+          <div class="contact-info">
+            <div class="contact-name">Aditi</div>
+            <div class="contact-last">Tap to chat</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="main">
+      <div class="header">
+        <div class="header-left">
+          <div class="avatar abhi" id="headerAvatar">A</div>
+          <div>
+            <div class="header-name" id="headerName">Realtime Chat</div>
+            <div class="header-sub" id="headerSub">Join as Abhi or Aditi</div>
+          </div>
+        </div>
+        <div id="status" style="color:#8696a0;font-size:13px;">Not connected</div>
+      </div>
+
+      <div class="chat" id="chat"></div>
+
+      <div class="composer-wrap">
+        <div class="emoji-panel" id="emojiPanel"></div>
+        <div class="composer">
+          <button class="emoji-btn" id="emojiToggle">😀</button>
+          <input id="messageInput" placeholder="Message" />
+          <button class="send-btn" id="sendBtn">Send</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const emojis = ["😀","😂","😍","😎","🥳","😭","👍","🔥","❤️","🙏","🎉","😡","👌","🤝","💯"];
+
+    let username = "";
+    let partner = "Aditi";
+
+    const chat = document.getElementById("chat");
+    const notif = document.getElementById("notif");
+    const nameInput = document.getElementById("nameInput");
+    const input = document.getElementById("messageInput");
+    const status = document.getElementById("status");
+    const headerName = document.getElementById("headerName");
+    const headerSub = document.getElementById("headerSub");
+    const headerAvatar = document.getElementById("headerAvatar");
+    const emojiPanel = document.getElementById("emojiPanel");
+
+    function showNotif(text) {
+      notif.textContent = text;
+      notif.style.display = "block";
+      clearTimeout(showNotif.t);
+      showNotif.t = setTimeout(() => notif.style.display = "none", 2500);
+    }
+
+    function addBubble(text, cls) {
+      const d = document.createElement("div");
+      d.className = "bubble " + cls;
+      d.innerHTML = `<div>${escapeHTML(text)}</div><div class="meta">${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
+      chat.appendChild(d);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function addSystem(text) {
+      const d = document.createElement("div");
+      d.className = "system";
+      d.textContent = text;
+      chat.appendChild(d);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;","'":"&#39;","\"":"&quot;",">":"&gt;"
+      })[m]);
+    }
+
+    function join(name) {
+      username = name.trim();
+      if (!username) return;
+
+      partner = username === "Abhi" ? "Aditi" : "Abhi";
+      headerName.textContent = `${username}`;
+      headerSub.textContent = `Chatting with ${partner}`;
+      headerAvatar.textContent = username[0].toUpperCase();
+      status.textContent = `Connected as ${username}`;
+      socket.emit("join", username);
+      addSystem(`You joined as ${username}`);
+    }
+
+    document.getElementById("joinBtn").onclick = () => join(nameInput.value);
+    document.getElementById("abhiContact").onclick = () => {
+      nameInput.value = "Abhi";
+      join("Abhi");
+    };
+    document.getElementById("aditiContact").onclick = () => {
+      nameInput.value = "Aditi";
+      join("Aditi");
+    };
+
+    document.getElementById("sendBtn").onclick = sendMsg;
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") sendMsg();
+    });
+
+    function sendMsg() {
+      const text = input.value.trim();
+      if (!text || !username) return;
+
+      socket.emit("chat message", {
+        from: username,
+        to: partner,
+        text,
+        time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+      });
+
+      input.value = "";
+    }
+
+    document.getElementById("emojiToggle").onclick = () => {
+      emojiPanel.style.display = emojiPanel.style.display === "flex" ? "none" : "flex";
+    };
+
+    emojis.forEach(e => {
+      const b = document.createElement("button");
+      b.textContent = e;
+      b.onclick = () => {
+        input.value += e;
+        input.focus();
+      };
+      emojiPanel.appendChild(b);
+    });
+
+    document.addEventListener("click", e => {
+      const inside = emojiPanel.contains(e.target) || e.target.id === "emojiToggle";
+      if (!inside) emojiPanel.style.display = "none";
+    });
+
+    socket.on("system", msg => {
+      addSystem(msg);
+      showNotif(msg);
+    });
+
+    socket.on("chat message", data => {
+      const isMine = data.from === username;
+      addBubble(`${data.from}: ${data.text}`, isMine ? "me" : "them");
+      if (!isMine && username) showNotif(`${data.from} sent: ${data.text}`);
+    });
+  </script>
+</body>
+</html>
